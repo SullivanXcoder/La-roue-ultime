@@ -1,130 +1,460 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>La Roue Ultime ++</title>
-  <link rel="stylesheet" href="style.css">
-  <meta name="theme-color" content="#111111">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>La Roue Ultime</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee+Shade&family=Luckiest+Guy&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#fff8ef;
+      --ink:#2b1e10;
+      --accent:#ff4d6d;
+      --accent-2:#00b4d8;
+      --accent-3:#ffd166;
+      --accent-4:#06d6a0;
+      --panel:#fff1dc;
+      --muted:#8b6f47;
+      --shadow: 0 10px 30px rgba(0,0,0,.12);
+      --radius:18px;
+    }
+    html,body{height:100%; scroll-behavior:smooth;}
+    body{
+      margin:0; background:var(--bg); color:var(--ink); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    }
+    header{
+      display:flex; align-items:center; gap:16px; padding:18px 20px; position:sticky; top:0; background:linear-gradient(180deg, #fffaf2 0%, #fff3e2 100%);
+      border-bottom:1px solid #efdcc3; z-index:5;
+    }
+    .logo{font-family:"Bungee Shade", cursive; font-size:28px; letter-spacing:1px; color:var(--accent); text-shadow: 0 2px 0 #00000010}
+    .tag{font-size:12px; padding:4px 8px; border-radius:999px; background:var(--accent-3); font-weight:600; color:#2b2100;}
+    nav.topnav{ margin-left:14px; display:flex; gap:8px; }
+    .navlink{ text-decoration:none; color:var(--ink); font-weight:700; padding:6px 10px; border-radius:999px; border:1px solid #efdcc3; background:#fff3e6 }
+    .navlink:hover{ background:#ffe9d1 }
+    main{display:grid; grid-template-columns: 360px 1fr 320px; gap:18px; padding:18px; max-width:1400px; margin-inline:auto;}
+    @media (max-width: 1100px){ main{grid-template-columns:1fr;} }
+
+    .card{background:var(--panel); border:1px solid #efdcc3; border-radius:var(--radius); box-shadow:var(--shadow);}
+    .card h2{font-family:"Luckiest Guy", cursive; letter-spacing:0.5px; font-size:22px; margin:0 0 10px}
+    .section{padding:16px;}
+
+    /* LEFT */
+    .controls label{font-size:12px; color:var(--muted); font-weight:600; display:block; margin-bottom:6px}
+    input[type="text"], input[type="number"], textarea, select, input[type="range"]{
+      width:100%; padding:10px 12px; border-radius:12px; border:1px solid #e7d3b2; background:#fff; box-sizing:border-box;
+      font:inherit; color:var(--ink);
+    }
+    input[type="range"]{ padding:0; height:36px; }
+    textarea{min-height:84px; resize:vertical}
+    .row{display:flex; gap:10px;}
+    .row > *{flex:1}
+    .btn{appearance:none; border:none; background:var(--ink); color:#fff; padding:10px 14px; border-radius:12px; font-weight:700; cursor:pointer; box-shadow:0 4px 0 #00000020; transition:transform .05s ease;}
+    .btn:active{transform:translateY(1px)}
+    .btn.alt{background:var(--accent)}
+    .btn.ghost{background:#fff; color:var(--ink); border:1px solid #e7d3b2}
+    .hint{font-size:12px; color:var(--muted)}
+
+    /* CENTER */
+    .stage{display:grid; place-items:center; padding:20px}
+    canvas{max-width:min(92vw, 600px); aspect-ratio:1/1}
+    .spinbar{display:flex; gap:12px; align-items:center; justify-content:center; padding:10px 0 18px}
+    .big{font-size:18px; padding:14px 22px; border-radius:999px}
+    .result{font-family:"Luckiest Guy"; font-size:28px; text-align:center; margin-top:6px}
+
+    /* RIGHT */
+    .stats table{width:100%; border-collapse:collapse; font-size:14px}
+    .stats th, .stats td{padding:8px 6px; border-bottom:1px solid #ead8bd; text-align:left}
+    .pill{display:inline-block; padding:2px 8px; border-radius:999px; background:#fff; border:1px solid #ead8bd; font-weight:600; font-size:12px}
+    .wheels-list li{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; border:1px solid #ead8bd; border-radius:12px; background:#fff;}
+    .wheels-list{display:flex; flex-direction:column; gap:8px; list-style:none; padding:0; margin:0}
+    .muted{color:var(--muted); font-size:12px}
+    .subtle{opacity:.9}
+  </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">🎯 La Roue Ultime <span class="plus">++</span></div>
-    <div class="spacer"></div>
-    <button id="themeToggle" class="btn ghost" aria-label="Changer de thème">🌗</button>
+  <header>
+    <div class="logo">La Roue Ultime</div>
+    <span class="tag">style années 50</span>
+    <nav class="topnav" aria-label="Sections">
+      <a class="navlink" href="#wheelSection">Roue</a>
+      <a class="navlink" href="#statsSection">Statistiques</a>
+      <a class="navlink" href="#settingsSection">Paramètres</a>
+    </nav>
+    <div style="margin-left:auto; display:flex; gap:8px; align-items:center">
+      <label class="muted" style="display:flex; gap:8px; align-items:center">
+        <input id="speakToggle" type="checkbox" checked /> Annoncer le résultat
+      </label>
+      <select id="voiceSelect" title="Voix"></select>
+    </div>
   </header>
 
-  <main class="container">
-    <section class="panel wheel-panel">
-      <div class="wheel-wrap">
-        <div id="pointer">▼</div>
-        <svg id="wheel" class="wheel" viewBox="-50 -50 100 100" aria-label="Roue de tirage"></svg>
+  <main>
+    <!-- LEFT: wheel management + choices -->
+    <section id="settingsSection" class="card section controls">
+      <h2>Paramètres</h2>
+      <label for="spinDuration">⏱️ Durée du spin : <strong><span id="spinDurationLabel">4.0s</span></strong></label>
+      <input id="spinDuration" type="range" min="1200" max="12000" step="200" value="4000" />
+      <p class="hint">La durée est enregistrée en local sur ton appareil (iPhone compris). Pas besoin de réinstaller.</p>
+
+      <hr style="margin:18px 0; border:none; border-top:1px dashed #e7d3b2">
+      <h2 id="wheelSection">Mes roues</h2>
+      <div class="row" style="margin-bottom:8px">
+        <select id="wheelSelect"></select>
+        <button class="btn ghost" id="newWheelBtn">Nouvelle</button>
+      </div>
+      <div class="row" style="margin-bottom:12px">
+        <button class="btn ghost" id="renameWheelBtn">Renommer</button>
+        <button class="btn ghost" id="deleteWheelBtn">Supprimer</button>
+      </div>
+      <p class="hint" id="wheelInfo"></p>
+
+      <h2>Choix</h2>
+      <div class="row" style="margin-bottom:8px">
+        <input id="choiceInput" type="text" placeholder="Ajouter un choix (ex: Méditation)" />
+        <button class="btn alt" id="addChoiceBtn">Ajouter</button>
+      </div>
+      <textarea id="bulkArea" placeholder="Import en masse (un choix par ligne)"></textarea>
+      <div class="row" style="margin-top:8px">
+        <button class="btn" id="bulkAddBtn">Importer</button>
+        <button class="btn ghost" id="clearChoicesBtn">Vider</button>
+      </div>
+      <p class="hint">Astuce: colle une grande liste, c'est illimité ✨</p>
+
+      <div style="margin-top:14px">
+        <button class="btn" id="resetStatsBtn">Réinitialiser les statistiques</button>
       </div>
 
-      <div class="controls">
-        <button id="spinBtn" class="btn primary big">SPIN</button>
-
-        <div class="setting">
-          <label for="spinDuration">⏱️ Durée du spin : <span id="spinDurationLabel">4.0s</span></label>
-          <input id="spinDuration" type="range" min="1000" max="12000" step="250" value="4000">
-        </div>
-
-        <div class="grid two">
-          <div class="setting">
-            <label>🎲 Multi‑tirage</label>
-            <select id="multiDraw">
-              <option value="1">1 choix</option>
-              <option value="2">2 choix</option>
-              <option value="3">3 choix</option>
-            </select>
-          </div>
-          <div class="setting">
-            <label class="row">
-              <input type="checkbox" id="modeElimination">
-              <span>🧹 Mode élimination</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="grid two">
-          <div class="setting">
-            <label class="row">
-              <input type="checkbox" id="ttsToggle" checked>
-              <span>🗣️ Annoncer le résultat</span>
-            </label>
-          </div>
-          <div class="setting">
-            <label class="row">
-              <input type="checkbox" id="soundToggle">
-              <span>🔔 Effet “click”</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="result">
-          <div class="result-title">Résultat</div>
-          <div id="resultText" class="result-text">—</div>
-        </div>
+      <hr style="margin:18px 0; border:none; border-top:1px dashed #e7d3b2">
+      <h2>Nombre aléatoire</h2>
+      <div class="row" style="margin-bottom:8px">
+        <label style="flex:0 0 120px; align-self:center">1 à</label>
+        <input id="maxNumber" type="number" value="10" min="1" />
       </div>
+      <div class="row">
+        <button class="btn" id="pickNumberBtn">Tirer un nombre</button>
+        <span id="numberResult" class="result" style="font-size:22px"></span>
+      </div>
+      <p class="hint">Pratique pour choisir un épisode, des répétitions, etc.</p>
     </section>
 
-    <section class="panel list-panel">
-      <h2>🧩 Choix de la roue</h2>
-      <div class="add-row">
-        <input id="newChoice" class="input" placeholder="Ajouter un choix et Enter…">
-        <button id="addChoice" class="btn">Ajouter</button>
+    <!-- CENTER: wheel stage -->
+    <section class="card section stage">
+      <canvas id="wheel" width="600" height="600" aria-label="Roue des choix"></canvas>
+      <div class="spinbar">
+        <button class="btn big alt" id="spinBtn">SPIN 🎰</button>
+        <span class="muted">Appuie sur la roue ou la barre espace</span>
       </div>
-
-      <ul id="choicesList" class="choices"></ul>
-
-      <div class="row gap mt">
-        <button id="resetElimination" class="btn ghost">Réactiver tous les choix</button>
-        <button id="shuffleChoices" class="btn ghost">Mélanger</button>
-        <button id="clearChoices" class="btn danger">Tout effacer</button>
-      </div>
-
-      <div class="row gap mt">
-        <button id="exportBtn" class="btn">Exporter JSON</button>
-        <label class="btn">
-          Importer JSON
-          <input id="importFile" type="file" accept="application/json" hidden>
-        </label>
-      </div>
+      <div class="result" id="lastResult">—</div>
     </section>
 
-    <section class="panel stats-panel">
-      <h2>📈 Statistiques</h2>
-      <div class="grid two">
-        <div class="stat">
-          <div class="stat-label">Spins totaux</div>
-          <div id="totalSpins" class="stat-value">0</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Choix actifs</div>
-          <div id="activeCount" class="stat-value">0</div>
-        </div>
-      </div>
-
-      <canvas id="pie" width="420" height="240" class="mt"></canvas>
-
-      <table class="table mt" aria-label="Fréquence par choix">
-        <thead><tr><th>Choix</th><th>Fréquence</th></tr></thead>
-        <tbody id="statsBody"></tbody>
-      </table>
-
-      <h3 class="mt">🕘 10 derniers tirages</h3>
-      <ol id="history" class="history"></ol>
+    <!-- RIGHT: stats + ranking -->
+    <section id="statsSection" class="card section stats">
+      <h2>Statistiques</h2>
+      <div id="statsWrap"></div>
+      <h2 style="margin-top:16px">Classement des roues</h2>
+      <ul id="wheelsRanking" class="wheels-list"></ul>
+      <p class="hint">Classement basé sur le nombre total de tirages par roue.</p>
     </section>
   </main>
 
-  <footer class="foot">
-    <small>Made with ❤️ — sauvegarde locale, PWA‑friendly</small>
-  </footer>
+<script>
+(function(){
+  // ---------- Storage ----------
+  const storeKey = 'ultimateWheelV1';
+  const DURATION_KEY = 'ru.spinDurationMs';
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => Array.from(document.querySelectorAll(sel));
 
-  <audio id="tickAudio">
-    <source src="data:audio/wav;base64,UklGRmQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABYAAAAAAABkAAAAPwAAAP///8zMzP///wAA" type="audio/wav">
-  </audio>
+  const defaultWheel = {
+    choices: [
+      { label: 'Marche', count: 0 },
+      { label: 'Méditation', count: 0 },
+      { label: 'Montage vidéo', count: 0 },
+      { label: 'Cuisine', count: 0 },
+      { label: 'Jeu vidéo', count: 0 }
+    ],
+    createdAt: Date.now()
+  };
 
-  <script src="script.js"></script>
+  function load(){
+    const raw = localStorage.getItem(storeKey);
+    if (!raw){
+      const data = { wheels: { 'Par défaut': defaultWheel }, activeWheel: 'Par défaut' };
+      localStorage.setItem(storeKey, JSON.stringify(data));
+      return data;
+    }
+    try{ return JSON.parse(raw); } catch(e){
+      console.warn('Reset storage (corrupt)');
+      localStorage.removeItem(storeKey);
+      return load();
+    }
+  }
+  function save(){ localStorage.setItem(storeKey, JSON.stringify(state)); refreshUI(); }
+
+  let state = load();
+
+  function getActive(){ return state.wheels[state.activeWheel]; }
+
+  // ---------- Wheel Drawing ----------
+  const canvas = $('#wheel');
+  const ctx = canvas.getContext('2d');
+  let rotation = -Math.PI/2; // pointer at top
+  let isSpinning = false;
+
+  function colorFor(i){
+    // pleasant retro palette rotation
+    const colors = ['#ffadad','#ffd6a5','#fdffb6','#caffbf','#9bf6ff','#a0c4ff','#bdb2ff','#ffc6ff','#fffffc'];
+    return colors[i % colors.length];
+  }
+
+  function drawWheel(){
+    const wheel = getActive();
+    const items = wheel.choices.length ? wheel.choices : [{label:'Ajoute des choix', count:0}];
+    const cx = canvas.width/2, cy = canvas.height/2, r = Math.min(cx,cy)-8;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rotation);
+
+    const arc = (Math.PI*2)/items.length;
+
+    items.forEach((it, i)=>{
+      const start = i*arc, end = start+arc;
+      // slice
+      ctx.beginPath();
+      ctx.moveTo(0,0);
+      ctx.arc(0,0,r,start,end);
+      ctx.closePath();
+      ctx.fillStyle = colorFor(i);
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // text
+      ctx.save();
+      ctx.fillStyle = '#2b1e10';
+      ctx.rotate(start + arc/2);
+      ctx.textAlign = 'right';
+      ctx.font = 'bold 18px Inter';
+      ctx.fillText(it.label, r-12, 6);
+      ctx.restore();
+    });
+    ctx.restore();
+
+    // center hub
+    ctx.beginPath();
+    ctx.arc(cx, cy, 30, 0, Math.PI*2);
+    ctx.fillStyle = '#2b1e10';
+    ctx.fill();
+
+    // pointer
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - (Math.min(cx,cy)-2));
+    ctx.lineTo(cx-14, cy - (Math.min(cx,cy)+24));
+    ctx.lineTo(cx+14, cy - (Math.min(cx,cy)+24));
+    ctx.closePath();
+    ctx.fillStyle = '#ff4d6d';
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#b71f3a';
+    ctx.stroke();
+  }
+
+  // ---------- Spin Logic ----------
+  // Load persisted duration (default 4000 ms)
+  const durationSlider = $('#spinDuration');
+  const durationLabel  = $('#spinDurationLabel');
+  let spinDurationMs = parseInt(localStorage.getItem(DURATION_KEY) || '4000', 10);
+
+  if (durationSlider){
+    durationSlider.value = String(spinDurationMs);
+    durationLabel.textContent = (spinDurationMs/1000).toFixed(1)+'s';
+    durationSlider.addEventListener('input', ()=>{
+      spinDurationMs = parseInt(durationSlider.value, 10);
+      durationLabel.textContent = (spinDurationMs/1000).toFixed(1)+'s';
+      localStorage.setItem(DURATION_KEY, String(spinDurationMs));
+    });
+  }
+
+  function spin(){
+    if (isSpinning) return;
+    const items = getActive().choices;
+    if (!items.length) return;
+
+    isSpinning = true;
+    const arc = (Math.PI*2)/items.length;
+
+    const randomIndex = Math.floor(Math.random()*items.length);
+    // Target angle so that the chosen slice lands at the pointer (top)
+    const targetAngle = (Math.PI*1.5) - (randomIndex*arc + arc/2);
+
+    // Normalize current angle to [0, 2PI)
+    const TAU = Math.PI*2;
+    let current = ((rotation % TAU) + TAU) % TAU;
+
+    // Add several extra spins for flair, proportional to duration
+    const extraSpins = Math.max(3, Math.min(10, Math.round(spinDurationMs/800))) * TAU;
+    const final = targetAngle + extraSpins;
+    const delta = shortestPositiveDelta(current, final);
+
+    const duration = spinDurationMs; // <-- adjustable and persisted
+    const start = performance.now();
+
+    requestAnimationFrame(function step(now){
+      const t = Math.min(1, (now - start)/duration);
+      const eased = easeOutCubic(t);
+      rotation = current + delta * eased;
+      drawWheel();
+      if (t < 1) {
+        requestAnimationFrame(step);
+      } else {
+        isSpinning = false;
+        landed(randomIndex);
+      }
+    });
+  }
+  function shortestPositiveDelta(from, to){
+    const TAU = Math.PI*2;
+    let d = (to - from) % TAU; if (d < 0) d += TAU; return d;
+  }
+  function easeOutCubic(x){ return 1 - Math.pow(1 - x, 3); }
+
+  function landed(index){
+    const wheel = getActive();
+    const item = wheel.choices[index];
+    if (!item) return;
+    item.count = (item.count||0) + 1;
+    $('#lastResult').textContent = '→ ' + item.label;
+    save();
+    announce(item.label);
+  }
+
+  // ---------- Speech ----------
+  let voices = [];
+  function loadVoices(){
+    voices = window.speechSynthesis.getVoices();
+    const select = $('#voiceSelect');
+    select.innerHTML = '';
+    const preferred = voices.filter(v => /fr/i.test(v.lang));
+    const list = preferred.length ? preferred : voices;
+    list.forEach((v,i)=>{
+      const opt = document.createElement('option');
+      opt.value = v.name; opt.textContent = `${v.name} (${v.lang})`;
+      select.appendChild(opt);
+    });
+  }
+  loadVoices();
+  if (speechSynthesis.onvoiceschanged !== undefined){ speechSynthesis.onvoiceschanged = loadVoices; }
+
+  function announce(text){
+    if (!$('#speakToggle').checked) return;
+    const u = new SpeechSynthesisUtterance(text);
+    const pick = voices.find(v => v.name === $('#voiceSelect').value) || voices.find(v=>/fr/i.test(v.lang)) || voices[0];
+    if (pick) u.voice = pick;
+    u.lang = (pick && pick.lang) || 'fr-FR';
+    u.rate = 1; u.pitch = 1; u.volume = 1;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(u);
+  }
+
+  // ---------- UI Sync ----------
+  function refreshUI(){
+    // wheel list
+    const wheelSelect = $('#wheelSelect');
+    wheelSelect.innerHTML = '';
+    Object.keys(state.wheels).forEach(name => {
+      const o = document.createElement('option'); o.value = name; o.textContent = name; if (name===state.activeWheel) o.selected = true; wheelSelect.appendChild(o);
+    });
+    const w = getActive();
+    $('#wheelInfo').textContent = `${w.choices.length} choix • créé le ${new Date(w.createdAt).toLocaleDateString()}`;
+
+    // stats table
+    const total = w.choices.reduce((a,c)=>a+(c.count||0),0) || 0;
+    let html = '<table><thead><tr><th>Choix</th><th class="subtle">Tirages</th><th class="subtle">%</th></tr></thead><tbody>';
+    w.choices.forEach(c=>{
+      const pct = total ? Math.round((c.count||0)*1000/total)/10 : 0;
+      html += `<tr><td>${escapeHTML(c.label)}</td><td>${c.count||0}</td><td>${pct} %</td></tr>`;
+    });
+    html += '</tbody></table>';
+    $('#statsWrap').innerHTML = html;
+
+    drawWheel();
+    renderRanking();
+  }
+
+  function renderRanking(){
+    const list = $('#wheelsRanking');
+    const entries = Object.entries(state.wheels).map(([name, w])=>({
+      name, spins: w.choices.reduce((a,c)=>a+(c.count||0),0)
+    })).sort((a,b)=>b.spins - a.spins);
+    list.innerHTML = entries.map(e=> `<li><span>${escapeHTML(e.name)}</span><span class="pill">${e.spins} tirages</span></li>`).join('') || '<p class="muted">Aucun tirage encore.</p>';
+  }
+
+  // ---------- Helpers ----------
+  function escapeHTML(s){ return s.replace(/[&<>\"']/g, m=>({\"&\":\"&amp;\",\"<\":\"&lt;\",\">\":\"&gt;\",\"\\\"\":\"&quot;\",\"'\":\"&#39;\"}[m])); }
+
+  // ---------- Events ----------
+  $('#spinBtn').addEventListener('click', spin);
+  canvas.addEventListener('click', spin);
+  document.addEventListener('keydown', e=>{ if (e.code==='Space'){ e.preventDefault(); spin(); }});
+
+  $('#addChoiceBtn').addEventListener('click', ()=>{
+    const val = $('#choiceInput').value.trim(); if(!val) return;
+    getActive().choices.push({ label: val, count: 0 });
+    $('#choiceInput').value=''; save();
+  });
+
+  $('#bulkAddBtn').addEventListener('click', ()=>{
+    const lines = $('#bulkArea').value.split(/\\r?\\n/).map(s=>s.trim()).filter(Boolean);
+    const w = getActive();
+    lines.forEach(l => w.choices.push({label:l, count:0}));
+    $('#bulkArea').value=''; save();
+  });
+
+  $('#clearChoicesBtn').addEventListener('click', ()=>{
+    if (!confirm('Supprimer tous les choix de cette roue ?')) return;
+    getActive().choices = []; save();
+  });
+
+  $('#resetStatsBtn').addEventListener('click', ()=>{
+    if (!confirm('Réinitialiser les compteurs de cette roue ?')) return;
+    getActive().choices.forEach(c=> c.count = 0); save();
+  });
+
+  $('#wheelSelect').addEventListener('change', e=>{ state.activeWheel = e.target.value; save(); });
+  $('#newWheelBtn').addEventListener('click', ()=>{
+    let name = prompt('Nom de la nouvelle roue :', 'Nouvelle roue');
+    if (!name) return;
+    if (state.wheels[name]){ alert('Ce nom existe déjà.'); return; }
+    state.wheels[name] = { choices: [], createdAt: Date.now() };
+    state.activeWheel = name; save();
+  });
+  $('#renameWheelBtn').addEventListener('click', ()=>{
+    const old = state.activeWheel; const name = prompt('Renommer la roue :', old);
+    if (!name || name===old) return;
+    if (state.wheels[name]){ alert('Ce nom existe déjà.'); return; }
+    state.wheels[name] = state.wheels[old]; delete state.wheels[old]; state.activeWheel = name; save();
+  });
+  $('#deleteWheelBtn').addEventListener('click', ()=>{
+    const name = state.activeWheel;
+    if (!confirm(`Supprimer la roue "${name}" ?`)) return;
+    delete state.wheels[name];
+    if (!Object.keys(state.wheels).length) state.wheels['Par défaut'] = defaultWheel;
+    state.activeWheel = Object.keys(state.wheels)[0];
+    save();
+  });
+
+  $('#pickNumberBtn').addEventListener('click', ()=>{
+    const max = Math.max(1, parseInt($('#maxNumber').value||\"10\",10));
+    const n = 1 + Math.floor(Math.random()*max);
+    $('#numberResult').textContent = n;
+    announce(String(n));
+  });
+
+  // Initial draw
+  refreshUI();
+})();
+</script>
 </body>
 </html>
