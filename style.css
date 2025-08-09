@@ -1,0 +1,92 @@
+/* ====== La Roue Ultime ++ — Style ====== */
+:root{
+  --bg:#0e0f10; --fg:#f1f1f1; --muted:#9aa0a6; --brand:#ff3c6a; --accent:#ffd166;
+  --card:#17181b; --border:#2a2c31; --ok:#33d17a; --danger:#ff5c5c;
+}
+:root.light{
+  --bg:#faf7f2; --fg:#1a1a1a; --muted:#666; --brand:#c7224f; --accent:#d19b00;
+  --card:#ffffff; --border:#e8e2da; --ok:#0ea768; --danger:#d03c3c;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{
+  background:var(--bg); color:var(--fg); font:16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+}
+
+.topbar{
+  position:sticky; top:0; z-index:10;
+  display:flex; align-items:center; gap:12px;
+  padding:12px 16px; background:var(--card); border-bottom:1px solid var(--border);
+}
+.brand{font-weight:800; letter-spacing:.3px}
+.brand .plus{color:var(--brand); font-weight:900}
+.spacer{flex:1}
+
+.container{
+  display:grid; gap:16px; padding:16px; max-width:1100px; margin:0 auto;
+  grid-template-columns: 1.2fr .8fr; align-items:start;
+}
+@media (max-width: 900px){
+  .container{grid-template-columns: 1fr}
+}
+
+.panel{
+  background:var(--card); border:1px solid var(--border); border-radius:16px;
+  padding:16px; box-shadow:0 10px 30px rgba(0,0,0,.2);
+}
+
+.wheel-wrap{ position:relative; display:grid; place-items:center; margin:8px 0 16px }
+#wheel{ width:min(420px, 86vw); height:auto; }
+#pointer{ position:absolute; top:-4px; font-weight:900; color:var(--accent) }
+
+.controls{ display:flex; flex-direction:column; gap:10px }
+.grid.two{ display:grid; grid-template-columns:1fr 1fr; gap:10px }
+.row{ display:flex; align-items:center; gap:10px }
+.gap{ gap:10px }
+
+.btn{
+  background:var(--border); color:var(--fg); border:none; padding:10px 14px;
+  border-radius:12px; cursor:pointer; transition:.2s transform, .2s opacity;
+}
+.btn:hover{ transform:translateY(-1px) }
+.btn:active{ transform:translateY(0) scale(.98) }
+.btn.primary{ background:var(--brand); color:white; font-weight:800 }
+.btn.big{ font-size:18px; padding:14px 18px }
+.btn.ghost{ background:transparent; border:1px solid var(--border) }
+.btn.danger{ background:var(--danger); color:#fff }
+
+.input{
+  width:100%; padding:10px 12px; border-radius:12px; border:1px solid var(--border);
+  background:transparent; color:var(--fg);
+}
+.add-row{ display:flex; gap:8px; }
+
+.setting label{ display:block; font-size:14px; color:var(--muted); margin-bottom:6px }
+.setting .row{ margin:0 }
+#spinDuration{ width:100% }
+
+.choices{ list-style:none; padding:0; margin:10px 0 0; display:flex; flex-direction:column; gap:8px; max-height:280px; overflow:auto }
+.choice{
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  padding:8px 10px; border:1px dashed var(--border); border-radius:12px;
+}
+.badge{ font-size:12px; color:var(--muted) }
+.choice .actions{ display:flex; gap:8px }
+
+.result{ margin-top:4px; padding:10px; border:1px solid var(--border); border-radius:12px }
+.result-title{ color:var(--muted); font-size:13px }
+.result-text{ font-weight:800; font-size:20px }
+
+.stat{ padding:12px; border:1px solid var(--border); border-radius:12px }
+.stat-label{ color:var(--muted); font-size:12px }
+.stat-value{ font-size:28px; font-weight:800 }
+
+.table{ width:100%; border-collapse:collapse; font-size:14px }
+.table th, .table td{ padding:8px 10px; border-bottom:1px solid var(--border) }
+.table tr:last-child td{ border-bottom:none }
+
+.history{ margin:6px 0 0; color:var(--muted) }
+.mt{ margin-top:12px }
+
+.foot{ text-align:center; padding:20px 10px; color:var(--muted) }
