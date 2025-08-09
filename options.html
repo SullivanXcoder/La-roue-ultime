@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Paramètres – Roue Ultime</title>
+  <link rel="stylesheet" href="assets/styles.css"/>
+</head>
+<body>
+  <header class="header"><h1>⚙️ Paramètres</h1></header>
+  <main class="container row">
+    <section class="card row">
+      <label for="speed">Durée du spin (ms)</label>
+      <input id="speed" class="input" type="number" min="800" max="12000" step="100"/>
+
+      <label>Couleurs des segments</label>
+      <div id="colorList" class="row"></div>
+      <button id="addColor" class="ghost">+ Ajouter une couleur</button>
+
+      <label>Voix</label>
+      <div class="row">
+        <label><input type="checkbox" id="voiceEnabled"> Activer l'annonce vocale</label>
+        <label>Vitesse de parole <input type="range" id="voiceRate" min="0.7" max="1.4" step="0.05"></label>
+      </div>
+
+      <button id="saveBtn" class="primary">Enregistrer</button>
+    </section>
+
+    <section class="card row">
+      <h3>Collections de roues</h3>
+      <label>Liste active</label>
+      <select id="listSelect" class="input"></select>
+      <div class="row">
+        <button id="setActive" class="primary">Définir comme active</button>
+        <button id="deleteList" class="ghost">Supprimer la liste</button>
+      </div>
+
+      <label>Éditer / Créer une liste</label>
+      <input id="listName" class="input" placeholder="Nom de la liste (ex: Déjeuner)"/>
+      <textarea id="listItems" class="input" rows="3" placeholder="Éléments séparés par des virgules"></textarea>
+      <div class="row">
+        <button id="saveList" class="primary">Enregistrer la liste</button>
+        <button id="loadIntoEditor" class="ghost">Charger depuis la sélection</button>
+      </div>
+      <div class="small">Astuce : la liste active est utilisée par défaut sur la page Roue.</div>
+    </section>
+  </main>
+  <nav class="tabbar">
+    <a href="index.html" class="tab"><span>🎡</span><small>Roue</small></a>
+    <a href="random.html" class="tab"><span>🎲</span><small>Nombre</small></a>
+    <a href="options.html" class="tab active"><span>⚙️</span><small>Paramètres</small></a>
+  </nav>
+  <script type="module" src="assets/options.js"></script>
+</body>
+</html>

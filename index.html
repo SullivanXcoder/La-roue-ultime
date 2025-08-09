@@ -1,449 +1,50 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>La Roue Ultime</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bungee+Shade&family=Luckiest+Guy&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg:#fff8ef; --ink:#2b1e10;
-      --accent:#ff4d6d; --accent-2:#00b4d8; --accent-3:#ffd166; --accent-4:#06d6a0;
-      --panel:#fff1dc; --muted:#8b6f47; --shadow: 0 10px 30px rgba(0,0,0,.12); --radius:18px;
-    }
-    html,body{height:100%; scroll-behavior:smooth}
-    body{ margin:0; background:var(--bg); color:var(--ink); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; }
-    header{ display:flex; align-items:center; gap:16px; padding:18px 20px; position:sticky; top:0; background:linear-gradient(180deg, #fffaf2 0%, #fff3e2 100%);
-      border-bottom:1px solid #efdcc3; z-index:5; }
-    .logo{font-family:"Bungee Shade", cursive; font-size:28px; letter-spacing:1px; color:var(--accent); text-shadow: 0 2px 0 #00000010}
-    .tag{font-size:12px; padding:4px 8px; border-radius:999px; background:var(--accent-3); font-weight:600; color:#2b2100;}
-    nav.topnav{ margin-left:14px; display:flex; gap:8px; }
-    .navlink{ text-decoration:none; color:var(--ink); font-weight:700; padding:6px 10px; border-radius:999px; border:1px solid #efdcc3; background:#fff3e6 }
-    .navlink.active{ background:#ffe3c2 }
-    .navlink:hover{ background:#ffe9d1 }
-    main{display:grid; grid-template-columns: 360px 1fr 320px; gap:18px; padding:18px; max-width:1400px; margin-inline:auto;}
-    @media (max-width: 1100px){
-      main{grid-template-columns:1fr;}
-      .stats-side{ order:3 }
-      .stage{ order:2 }
-      .controls{ order:1 }
-    }
-    .card{background:var(--panel); border:1px solid #efdcc3; border-radius:var(--radius); box-shadow:var(--shadow);}
-    .card h2{font-family:"Luckiest Guy", cursive; letter-spacing:0.5px; font-size:22px; margin:0 0 10px}
-    .section{padding:16px;}
-    .muted{color:var(--muted); font-size:12px}
-
-    /* Inputs */
-    .controls label{font-size:12px; color:var(--muted); font-weight:600; display:block; margin-bottom:6px}
-    input[type="text"], input[type="number"], textarea, select, input[type="range"], input[type="color"]{
-      width:100%; padding:10px 12px; border-radius:12px; border:1px solid #e7d3b2; background:#fff; box-sizing:border-box; font:inherit; color:var(--ink);
-    }
-    input[type="range"]{ padding:0; height:36px }
-    textarea{min-height:84px; resize:vertical}
-    .row{display:flex; gap:10px;} .row > *{flex:1}
-    .btn{appearance:none; border:none; background:var(--ink); color:#fff; padding:10px 14px; border-radius:12px; font-weight:700; cursor:pointer; box-shadow:0 4px 0 #00000020; transition:transform .05s ease;}
-    .btn:active{transform:translateY(1px)} .btn.alt{background:var(--accent)} .btn.ghost{background:#fff; color:var(--ink); border:1px solid #e7d3b2}
-    .big{font-size:18px; padding:14px 22px; border-radius:999px}
-
-    /* Stage */
-    .stage{display:grid; place-items:center; padding:20px}
-    canvas{max-width:min(92vw, 600px); aspect-ratio:1/1}
-    .spinbar{display:flex; gap:12px; align-items:center; justify-content:center; padding:10px 0 18px}
-    .result{font-family:"Luckiest Guy"; font-size:28px; text-align:center; margin-top:6px}
-
-    /* Stats */
-    .stats table{width:100%; border-collapse:collapse; font-size:14px}
-    .stats th, .stats td{padding:8px 6px; border-bottom:1px solid #ead8bd; text-align:left}
-    .pill{display:inline-block; padding:2px 8px; border-radius:999px; background:#fff; border:1px solid #ead8bd; font-weight:600; font-size:12px}
-    .wheels-list li{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; border:1px solid #ead8bd; border-radius:12px; background:#fff;}
-    .wheels-list{display:flex; flex-direction:column; gap:8px; list-style:none; padding:0; margin:0}
-  </style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Roue Ultime</title>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="stylesheet" href="assets/styles.css"/>
 </head>
 <body>
-  <header>
-    <div class="logo">La Roue Ultime</div>
-    <span class="tag">style années 50</span>
-    <nav class="topnav" aria-label="Sections">
-      <a class="navlink" data-target="#wheelTop" href="#wheelTop">Roue</a>
-      <a class="navlink" data-target="#statsSection" href="#statsSection">Statistiques</a>
-      <a class="navlink" data-target="#settingsMain" href="#settingsMain">Paramètres</a>
-    </nav>
-    <div style="margin-left:auto; display:flex; gap:8px; align-items:center">
-      <label class="muted" style="display:flex; gap:8px; align-items:center">
-        <input id="speakToggle" type="checkbox" checked /> Annoncer le résultat
-      </label>
-      <select id="voiceSelect" title="Voix"></select>
-    </div>
-  </header>
-
-  <main>
-    <!-- LEFT: Options de la roue + Paramètres principaux -->
-    <section class="card section controls">
-      <h2 id="settingsMain">Paramètres</h2>
-      <label>⏱️ Durée du spin : <strong><span id="spinDurationLabel">4.0s</span></strong></label>
-      <input id="spinDuration" type="range" min="800" max="15000" step="200" value="4000" />
-      <div class="row" style="margin-top:10px">
-        <div>
-          <label>⚡ Intensité / Vitesse</label>
-          <input id="spinIntensity" type="range" min="0.5" max="2.0" step="0.1" value="1.0">
-          <div class="muted">Plus haut = accélération plus forte</div>
-        </div>
-      </div>
-      <hr style="margin:18px 0; border:none; border-top:1px dashed #e7d3b2">
-      <h2>Thème</h2>
-      <div class="row">
-        <div>
-          <label>Couleur d’accent</label>
-          <input id="accentPicker" type="color" value="#ff4d6d">
-        </div>
-        <div>
-          <label>Couleur secondaire</label>
-          <input id="accent2Picker" type="color" value="#00b4d8">
-        </div>
-      </div>
-
-      <hr style="margin:18px 0; border:none; border-top:1px dashed #e7d3b2">
-      <h2>Mes roues</h2>
-      <div class="row" style="margin-bottom:8px">
-        <select id="wheelSelect"></select>
-        <button class="btn ghost" id="newWheelBtn">Nouvelle</button>
-      </div>
-      <div class="row" style="margin-bottom:12px">
-        <button class="btn ghost" id="renameWheelBtn">Renommer</button>
-        <button class="btn ghost" id="deleteWheelBtn">Supprimer</button>
-      </div>
-      <p class="muted" id="wheelInfo"></p>
-
-      <h2>Choix</h2>
-      <div class="row" style="margin-bottom:8px">
-        <input id="choiceInput" type="text" placeholder="Ajouter un choix (ex: Méditation)" />
-        <button class="btn alt" id="addChoiceBtn">Ajouter</button>
-      </div>
-      <textarea id="bulkArea" placeholder="Import en masse (un choix par ligne)"></textarea>
-      <div class="row" style="margin-top:8px">
-        <button class="btn" id="bulkAddBtn">Importer</button>
-        <button class="btn ghost" id="clearChoicesBtn">Vider</button>
-      </div>
-
-      <div style="margin-top:14px">
-        <button class="btn" id="resetStatsBtn">Réinitialiser les statistiques</button>
-      </div>
-
-      <hr style="margin:18px 0; border:none; border-top:1px dashed #e7d3b2">
-      <h2>Nombre aléatoire</h2>
-      <div class="row" style="margin-bottom:8px">
-        <label style="flex:0 0 120px; align-self:center">1 à</label>
-        <input id="maxNumber" type="number" value="10" min="1" />
-      </div>
-      <div class="row">
-        <button class="btn" id="pickNumberBtn">Tirer un nombre</button>
-        <span id="numberResult" class="result" style="font-size:22px"></span>
+  <header class="header"><h1>🎡 Roue Ultime</h1></header>
+  <main class="container row">
+    <section class="card">
+      <canvas id="wheelCanvas" width="800" height="800"></canvas>
+      <div class="pointer"></div>
+      <div class="center" style="gap:10px;margin-top:16px">
+        <button id="spinBtn" class="primary">Lancer</button>
+        <button id="shuffleBtn" class="ghost">Mélanger</button>
       </div>
     </section>
 
-    <!-- CENTER: roue -->
-    <section class="card section stage">
-      <a id="wheelTop"></a>
-      <canvas id="wheel" width="600" height="600" aria-label="Roue des choix"></canvas>
-      <div class="spinbar">
-        <button class="btn big alt" id="spinBtn">SPIN 🎰</button>
-        <span class="muted">Appuie sur la roue ou la barre espace</span>
-      </div>
-      <div class="result" id="lastResult">—</div>
-      <div class="stats card section" style="margin-top:16px">
-        <h2 id="statsSection">Statistiques</h2>
-        <div id="statsWrap"></div>
-      </div>
+    <section class="card">
+      <label>Choix (séparés par des virgules)</label>
+      <textarea id="choicesInput" class="input" rows="3">Pizza, Pâtes, Sushi, Burger, Salade, Tacos</textarea>
+      <div class="small">Astuce : collez votre liste, on s'occupe du reste.</div>
+      <div class="choices" id="chips"></div>
     </section>
 
-    <!-- RIGHT: classement -->
-    <section class="card section stats stats-side">
-      <h2>Classement des roues</h2>
-      <ul id="wheelsRanking" class="wheels-list"></ul>
-      <p class="muted">Classement basé sur le nombre total de tirages par roue.</p>
+    <section class="card" id="statsCard">
+      <h3>Statistiques</h3>
+      <div class="small">Spins totaux : <strong id="statTotal">0</strong> · Dernier : <strong id="statLast">—</strong></div>
+      <div id="histogram" class="choices" style="margin-top:8px"></div>
+      <button id="resetStats" class="ghost" style="margin-top:8px">Réinitialiser les stats</button>
     </section>
+
+    <section class="card center small">Astuce : réglez la vitesse et les couleurs dans ⚙️ Paramètres.</section>
   </main>
-
-<script>
-(function(){
-  // ---------- Storage & helpers ----------
-  const storeKey = 'ultimateWheelV1';
-  const DURATION_KEY = 'ru.spinDurationMs';
-  const INTENSITY_KEY = 'ru.spinIntensity';
-  const ACCENT_KEY = 'ru.accent'; const ACCENT2_KEY = 'ru.accent2';
-  const $ = sel => document.querySelector(sel);
-
-  const defaultWheel = {
-    choices: [
-      { label: 'Marche', count: 0 },
-      { label: 'Méditation', count: 0 },
-      { label: 'Montage vidéo', count: 0 },
-      { label: 'Cuisine', count: 0 },
-      { label: 'Jeu vidéo', count: 0 }
-    ],
-    createdAt: Date.now()
-  };
-
-  function load(){
-    const raw = localStorage.getItem(storeKey);
-    if (!raw){
-      const data = { wheels: { 'Par défaut': structuredClone(defaultWheel) }, activeWheel: 'Par défaut' };
-      localStorage.setItem(storeKey, JSON.stringify(data));
-      return data;
-    }
-    try{ return JSON.parse(raw); } catch(e){
-      console.warn('Reset storage (corrupt)');
-      localStorage.removeItem(storeKey);
-      return load();
-    }
+  <nav class="tabbar">
+    <a href="index.html" class="tab active"><span>🎡</span><small>Roue</small></a>
+    <a href="random.html" class="tab"><span>🎲</span><small>Nombre</small></a>
+    <a href="options.html" class="tab"><span>⚙️</span><small>Paramètres</small></a>
+  </nav>
+  <script type="module" src="assets/wheel.js"></script>
+  <script>
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('service-worker.js');
   }
-  function save(){ localStorage.setItem(storeKey, JSON.stringify(state)); refreshUI(); }
-  let state = load();
-  function getActive(){ return state.wheels[state.activeWheel]; }
-
-  // ---------- THEME (custom colors) ----------
-  const accentPicker = $('#accentPicker');
-  const accent2Picker = $('#accent2Picker');
-  let accent = localStorage.getItem(ACCENT_KEY) || getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#ff4d6d';
-  let accent2 = localStorage.getItem(ACCENT2_KEY) || getComputedStyle(document.documentElement).getPropertyValue('--accent-2').trim() || '#00b4d8';
-  if (accentPicker) accentPicker.value = accent;
-  if (accent2Picker) accent2Picker.value = accent2;
-  applyAccent(accent, accent2);
-  function applyAccent(a1,a2){
-    document.documentElement.style.setProperty('--accent', a1);
-    document.documentElement.style.setProperty('--accent-2', a2);
-  }
-  accentPicker?.addEventListener('input', e=>{ accent = e.target.value; localStorage.setItem(ACCENT_KEY, accent); applyAccent(accent, accent2); });
-  accent2Picker?.addEventListener('input', e=>{ accent2 = e.target.value; localStorage.setItem(ACCENT2_KEY, accent2); applyAccent(accent, accent2); });
-
-  // ---------- Voices ----------
-  let voices = [];
-  function loadVoices(){
-    voices = window.speechSynthesis.getVoices();
-    const select = $('#voiceSelect'); if(!select) return;
-    select.innerHTML = '';
-    const preferred = voices.filter(v => /fr/i.test(v.lang));
-    const list = preferred.length ? preferred : voices;
-    list.forEach((v)=>{
-      const opt = document.createElement('option');
-      opt.value = v.name; opt.textContent = `${v.name} (${v.lang})`;
-      select.appendChild(opt);
-    });
-  }
-  loadVoices();
-  if (speechSynthesis.onvoiceschanged !== undefined){ speechSynthesis.onvoiceschanged = loadVoices; }
-
-  function announce(text){
-    if (!$('#speakToggle').checked) return;
-    const u = new SpeechSynthesisUtterance(text);
-    const pick = voices.find(v => v.name === $('#voiceSelect').value) || voices.find(v=>/fr/i.test(v.lang)) || voices[0];
-    if (pick) u.voice = pick;
-    u.lang = (pick && pick.lang) || 'fr-FR';
-    u.rate = 1; u.pitch = 1; u.volume = 1;
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(u);
-  }
-
-  // ---------- Wheel Drawing ----------
-  const canvas = $('#wheel'); const ctx = canvas.getContext('2d');
-  let rotation = -Math.PI/2; let isSpinning = false;
-
-  function colorFor(i){
-    const colors = ['#ffadad','#ffd6a5','#fdffb6','#caffbf','#9bf6ff','#a0c4ff','#bdb2ff','#ffc6ff','#fffffc'];
-    return colors[i % colors.length];
-  }
-
-  function drawWheel(){
-    const wheel = getActive();
-    const items = wheel.choices.length ? wheel.choices : [{label:'Ajoute des choix', count:0}];
-    const cx = canvas.width/2, cy = canvas.height/2, r = Math.min(cx,cy)-8;
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.save(); ctx.translate(cx, cy); ctx.rotate(rotation);
-    const arc = (Math.PI*2)/items.length;
-
-    items.forEach((it, i)=>{
-      const start = i*arc, end = start+arc;
-      ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,r,start,end); ctx.closePath();
-      ctx.fillStyle = colorFor(i); ctx.fill();
-      ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.stroke();
-      ctx.save(); ctx.fillStyle = '#2b1e10'; ctx.rotate(start + arc/2);
-      ctx.textAlign = 'right'; ctx.font = 'bold 18px Inter'; ctx.fillText(it.label, r-12, 6); ctx.restore();
-    });
-    ctx.restore();
-    // hub
-    ctx.beginPath(); ctx.arc(cx, cy, 30, 0, Math.PI*2); ctx.fillStyle = '#2b1e10'; ctx.fill();
-    // pointer
-    ctx.beginPath(); ctx.moveTo(cx, cy - (Math.min(cx,cy)-2));
-    ctx.lineTo(cx-14, cy - (Math.min(cx,cy)+24)); ctx.lineTo(cx+14, cy - (Math.min(cx,cy)+24));
-    ctx.closePath(); ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#ff4d6d';
-    ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = '#b71f3a'; ctx.stroke();
-  }
-
-  // ---------- Spin Logic (with duration + intensity) ----------
-  const durationSlider = $('#spinDuration'); const durationLabel = $('#spinDurationLabel');
-  const intensitySlider = $('#spinIntensity');
-  let spinDurationMs = parseInt(localStorage.getItem(DURATION_KEY) || '4000', 10);
-  let spinIntensity = parseFloat(localStorage.getItem(INTENSITY_KEY) || '1.0'); // 0.5x to 2.0x
-
-  // init UI
-  if (durationSlider){ durationSlider.value = String(spinDurationMs); durationLabel.textContent = (spinDurationMs/1000).toFixed(1)+'s'; }
-  if (intensitySlider){ intensitySlider.value = String(spinIntensity); }
-
-  durationSlider?.addEventListener('input', ()=>{
-    spinDurationMs = parseInt(durationSlider.value, 10);
-    durationLabel.textContent = (spinDurationMs/1000).toFixed(1)+'s';
-    localStorage.setItem(DURATION_KEY, String(spinDurationMs));
-  });
-  intensitySlider?.addEventListener('input', ()=>{
-    spinIntensity = parseFloat(intensitySlider.value);
-    localStorage.setItem(INTENSITY_KEY, String(spinIntensity));
-  });
-
-  function spin(){
-    if (isSpinning) return;
-    const items = getActive().choices; if (!items.length) return;
-    isSpinning = true;
-    const arc = (Math.PI*2)/items.length;
-    const randomIndex = Math.floor(Math.random()*items.length);
-    const targetAngle = (Math.PI*1.5) - (randomIndex*arc + arc/2);
-
-    const TAU = Math.PI*2;
-    let current = ((rotation % TAU) + TAU) % TAU;
-
-    // Turns scale with duration AND intensity
-    const baseTurns = Math.max(3, Math.min(12, Math.round(spinDurationMs/900)));
-    const turns = baseTurns * spinIntensity;
-    const extraSpins = turns * TAU;
-
-    const final = targetAngle + extraSpins;
-    const delta = ((final - current) % TAU + TAU) % TAU;
-
-    const duration = spinDurationMs; const start = performance.now();
-
-    requestAnimationFrame(function step(now){
-      const t = Math.min(1, (now - start)/duration);
-      // Ease with stronger deceleration if intensity is high
-      const eased = 1 - Math.pow(1 - t, 3 * spinIntensity);
-      rotation = current + delta * eased;
-      drawWheel();
-      if (t < 1) requestAnimationFrame(step);
-      else { isSpinning = false; landed(randomIndex); }
-    });
-  }
-
-  function landed(index){
-    const wheel = getActive();
-    const item = wheel.choices[index]; if (!item) return;
-    item.count = (item.count||0) + 1;
-    document.getElementById('lastResult').textContent = '→ ' + item.label;
-    save(); announce(item.label);
-  }
-
-  // ---------- Stats & Ranking ----------
-  function refreshUI(){
-    // wheels
-    const wheelSelect = document.getElementById('wheelSelect');
-    wheelSelect.innerHTML = '';
-    Object.keys(state.wheels).forEach(name => {
-      const o = document.createElement('option'); o.value = name; o.textContent = name;
-      if (name===state.activeWheel) o.selected = true; wheelSelect.appendChild(o);
-    });
-    const w = getActive();
-    document.getElementById('wheelInfo').textContent = `${w.choices.length} choix • créé le ${new Date(w.createdAt).toLocaleDateString()}`;
-
-    // stats table
-    const total = w.choices.reduce((a,c)=>a+(c.count||0),0) || 0;
-    let html = '<table><thead><tr><th>Choix</th><th class="muted">Tirages</th><th class="muted">%</th></tr></thead><tbody>';
-    w.choices.forEach(c=>{
-      const pct = total ? Math.round((c.count||0)*1000/total)/10 : 0;
-      html += `<tr><td>${escapeHTML(c.label)}</td><td>${c.count||0}</td><td>${pct} %</td></tr>`;
-    });
-    html += '</tbody></table>';
-    document.getElementById('statsWrap').innerHTML = html;
-
-    renderRanking();
-    drawWheel();
-  }
-
-  function renderRanking(){
-    const list = document.getElementById('wheelsRanking');
-    const entries = Object.entries(state.wheels).map(([name, w])=>({
-      name, spins: w.choices.reduce((a,c)=>a+(c.count||0),0)
-    })).sort((a,b)=>b.spins - a.spins);
-    list.innerHTML = entries.map(e=> `<li><span>${escapeHTML(e.name)}</span><span class="pill">${e.spins} tirages</span></li>`).join('') || '<p class="muted">Aucun tirage encore.</p>';
-  }
-
-  function escapeHTML(s){ return s.replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
-
-  // ---------- Events ----------
-  document.getElementById('spinBtn').addEventListener('click', spin);
-  canvas.addEventListener('click', spin);
-  document.addEventListener('keydown', e=>{ if (e.code==='Space'){ e.preventDefault(); spin(); }});
-
-  document.getElementById('addChoiceBtn').addEventListener('click', ()=>{
-    const val = document.getElementById('choiceInput').value.trim(); if(!val) return;
-    getActive().choices.push({ label: val, count: 0 });
-    document.getElementById('choiceInput').value=''; save();
-  });
-  document.getElementById('bulkAddBtn').addEventListener('click', ()=>{
-    const lines = document.getElementById('bulkArea').value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-    const w = getActive(); lines.forEach(l => w.choices.push({label:l, count:0}));
-    document.getElementById('bulkArea').value=''; save();
-  });
-  document.getElementById('clearChoicesBtn').addEventListener('click', ()=>{
-    if (!confirm('Supprimer tous les choix de cette roue ?')) return;
-    getActive().choices = []; save();
-  });
-  document.getElementById('resetStatsBtn').addEventListener('click', ()=>{
-    if (!confirm('Réinitialiser les compteurs de cette roue ?')) return;
-    getActive().choices.forEach(c=> c.count = 0); save();
-  });
-
-  document.getElementById('wheelSelect').addEventListener('change', e=>{ state.activeWheel = e.target.value; save(); });
-  document.getElementById('newWheelBtn').addEventListener('click', ()=>{
-    let name = prompt('Nom de la nouvelle roue :', 'Nouvelle roue');
-    if (!name) return;
-    if (state.wheels[name]){ alert('Ce nom existe déjà.'); return; }
-    state.wheels[name] = { choices: [], createdAt: Date.now() };
-    state.activeWheel = name; save();
-  });
-  document.getElementById('renameWheelBtn').addEventListener('click', ()=>{
-    const old = state.activeWheel; const name = prompt('Renommer la roue :', old);
-    if (!name || name===old) return;
-    if (state.wheels[name]){ alert('Ce nom existe déjà.'); return; }
-    state.wheels[name] = state.wheels[old]; delete state.wheels[old]; state.activeWheel = name; save();
-  });
-  document.getElementById('deleteWheelBtn').addEventListener('click', ()=>{
-    const name = state.activeWheel;
-    if (!confirm(`Supprimer la roue "${name}" ?`)) return;
-    delete state.wheels[name];
-    if (!Object.keys(state.wheels).length) state.wheels['Par défaut'] = structuredClone(defaultWheel);
-    state.activeWheel = Object.keys(state.wheels)[0];
-    save();
-  });
-
-  document.getElementById('pickNumberBtn').addEventListener('click', ()=>{
-    const max = Math.max(1, parseInt(document.getElementById('maxNumber').value||"10",10));
-    const n = 1 + Math.floor(Math.random()*max);
-    document.getElementById('numberResult').textContent = n;
-    announce(String(n));
-  });
-
-  // nav links enforce scroll + active
-  document.querySelectorAll('.navlink').forEach(a=>{
-    a.addEventListener('click', (e)=>{
-      const target = a.getAttribute('data-target');
-      if(target){
-        e.preventDefault();
-        document.querySelectorAll('.navlink').forEach(l=>l.classList.remove('active'));
-        a.classList.add('active');
-        document.querySelector(target)?.scrollIntoView({behavior:'smooth', block:'start'});
-      }
-    });
-  });
-
-  // initial UI
-  refreshUI();
-})();</script>
+  </script>
 </body>
 </html>

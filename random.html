@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Nombre aléatoire – Roue Ultime</title>
+  <link rel="stylesheet" href="assets/styles.css"/>
+</head>
+<body>
+  <header class="header"><h1>🎲 Nombre aléatoire</h1></header>
+  <main class="container row">
+    <section class="card row">
+      <div class="row">
+        <label>Min</label>
+        <input id="min" class="input" type="number" value="1"/>
+      </div>
+      <div class="row">
+        <label>Max</label>
+        <input id="max" class="input" type="number" value="10"/>
+      </div>
+      <div class="row">
+        <label>Quantité (tirages uniques)</label>
+        <input id="count" class="input" type="number" value="1" min="1" max="50"/>
+      </div>
+      <button id="go" class="primary">Générer</button>
+    </section>
+
+    <section id="out" class="card"></section>
+  </main>
+  <nav class="tabbar">
+    <a href="index.html" class="tab"><span>🎡</span><small>Roue</small></a>
+    <a href="random.html" class="tab active"><span>🎲</span><small>Nombre</small></a>
+    <a href="options.html" class="tab"><span>⚙️</span><small>Paramètres</small></a>
+  </nav>
+  <script type="module" src="assets/random.js"></script>
+</body>
+</html>
